@@ -40,7 +40,7 @@
           <span style="color: var(--accent)">alpha</span>claw
         </h1>
         <p style="color: var(--text-muted)" class="text-xs mb-4">
-          OpenClaw made easier
+          OpenClaw made easy
         </p>
       </div>
       <form
@@ -72,13 +72,21 @@
       const submitButtonEl = document.getElementById("submit-btn");
 
       const kEnabledClasses = ["bg-white", "text-black", "hover:opacity-85"];
-      const kDisabledClasses = ["bg-gray-800", "text-gray-500", "cursor-not-allowed"];
+      const kDisabledClasses = [
+        "bg-gray-800",
+        "text-gray-500",
+        "cursor-not-allowed",
+      ];
 
       const syncButtonState = () => {
         const hasValue = passwordEl.value.length > 0;
         submitButtonEl.disabled = !hasValue;
-        kEnabledClasses.forEach((c) => submitButtonEl.classList.toggle(c, hasValue));
-        kDisabledClasses.forEach((c) => submitButtonEl.classList.toggle(c, !hasValue));
+        kEnabledClasses.forEach((c) =>
+          submitButtonEl.classList.toggle(c, hasValue),
+        );
+        kDisabledClasses.forEach((c) =>
+          submitButtonEl.classList.toggle(c, !hasValue),
+        );
       };
 
       passwordEl.addEventListener("input", syncButtonState);
