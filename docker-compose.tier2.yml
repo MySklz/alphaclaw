@@ -1,0 +1,112 @@
+# docker-compose.tier2.yml — Tier 2: Separate containers with iptables egress enforcement
+# Kumo runs in its own sovereign container. AlphaClaw can ONLY reach the internet via Kumo.
+# Requires Docker with iptables support (Fly.io Sprites, self-hosted Docker, Kubernetes).
+# Does NOT work on Render or Railway (no iptables).
+#
+# Usage: docker compose -f docker-compose.tier2.yml up
+#
+# Architecture:
+#   kumo (sovereign) ←── proxy traffic ──← alphaclaw (locked down)
+#   kumo-data volume: private (CA key, logs, config)
+#   kumo-certs volume: shared (ca.pem only, read-only by alphaclaw)
+
+services:
+  kumo:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: kumo-builder
+    image: kumo-standalone
+    entrypoint: ["/bin/sh"]
+    command:
+      - -c
+      - |
+        apk add --no-cache ca-certificates wget su-exec
+        kumo init --data-dir /data
+        cp /data/ca.pem /certs/ca.pem
+        chmod 0600 /data/ca-key.pem
+        chown -R nobody:nobody /data /certs 2>/dev/null || true
+        exec kumo serve --mode $${KUMO_MODE:-observe} --data-dir /data --verbose
+    ports:
+      - "9091:9091"   # Kumo health (proxy port NOT exposed externally)
+    volumes:
+      - kumo-data:/data          # Private: CA key, logs, config
+      - kumo-certs:/certs        # Shared: public CA cert only
+      - ./templates/alphaclaw.yaml:/etc/kumo/templates/alphaclaw.yaml:ro
+    environment:
+      - KUMO_MODE=${KUMO_MODE:-observe}
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:9091/healthz"]
+      interval: 5s
+      retries: 10
+    networks: [proxy-net]
+
+  alphaclaw:
+    build: .
+    ports:
+      - "3000:3000"
+    cap_add: [NET_ADMIN]    # For iptables setup only (see PRODUCTION NOTE below)
+    volumes:
+      - alphaclaw-data:/data
+      - kumo-certs:/certs:ro  # Read-only, public cert only
+    environment:
+      - SETUP_PASSWORD=${SETUP_PASSWORD}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - GITHUB_TOKEN=${GITHUB_TOKEN:-}
+      - GITHUB_WORKSPACE_REPO=${GITHUB_WORKSPACE_REPO:-}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+      - DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN:-}
+      - SLACK_BOT_TOKEN=${SLACK_BOT_TOKEN:-}
+      # Proxy config points to Kumo container
+      - HTTP_PROXY=http://kumo:8080
+      - HTTPS_PROXY=http://kumo:8080
+      - NO_PROXY=127.0.0.1,localhost,::1
+      - SSL_CERT_FILE=/certs/ca.pem
+      - NODE_EXTRA_CA_CERTS=/certs/ca.pem
+      # Kumo runs in its own container, skip internal Kumo
+      - KUMO_ENABLED=false
+      - TRUST_PROXY_HOPS=${TRUST_PROXY_HOPS:-1}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        # Set up iptables egress enforcement
+        KUMO_IP=$$(getent hosts kumo | awk '{print $$1}')
+        if [ -z "$$KUMO_IP" ]; then
+          echo "[semarang] ERROR: Cannot resolve 'kumo' hostname. Is Kumo running?"
+          exit 1
+        fi
+        echo "[semarang] Kumo IP: $$KUMO_IP"
+        iptables -F OUTPUT 2>/dev/null || true
+        iptables -A OUTPUT -p udp --dport 53 -j ACCEPT
+        iptables -A OUTPUT -p tcp --dport 53 -j ACCEPT
+        iptables -A OUTPUT -d "$$KUMO_IP" -p tcp --dport 8080 -j ACCEPT
+        iptables -A OUTPUT -o lo -j ACCEPT
+        iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+        iptables -A OUTPUT -j DROP
+        echo "[semarang] Egress rules applied. Agent can only reach internet via Kumo."
+        iptables -L OUTPUT -n --line-numbers
+        # Start AlphaClaw
+        exec /docker-entrypoint.sh alphaclaw start
+    depends_on:
+      kumo:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/api/status"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+    networks: [proxy-net]
+
+# PRODUCTION NOTE: In production, use the init container pattern instead.
+# The agent should NOT have CAP_NET_ADMIN. Docker Compose does not support
+# the init container + shared network namespace pattern cleanly, so this
+# test harness runs both steps in the same container.
+
+volumes:
+  kumo-data:       # Private: CA key, logs, policy
+  kumo-certs:      # Public: ca.pem only
+  alphaclaw-data:  # AlphaClaw persistent state
+
+networks:
+  proxy-net:

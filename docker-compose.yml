@@ -1,0 +1,39 @@
+# docker-compose.yml — Tier 1.5: Single container with Kumo + AlphaClaw
+# Kumo runs as a background process inside the same container.
+# All outbound HTTP traffic is intercepted and logged.
+#
+# Usage: docker compose up
+# Kumo health: http://localhost:9091/healthz
+# AlphaClaw UI: http://localhost:3000
+
+services:
+  alphaclaw:
+    build: .
+    ports:
+      - "3000:3000"   # AlphaClaw setup UI
+      - "9091:9091"   # Kumo health endpoint
+    volumes:
+      - alphaclaw-data:/data
+    environment:
+      - SETUP_PASSWORD=${SETUP_PASSWORD}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - GITHUB_TOKEN=${GITHUB_TOKEN:-}
+      - GITHUB_WORKSPACE_REPO=${GITHUB_WORKSPACE_REPO:-}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+      - DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN:-}
+      - SLACK_BOT_TOKEN=${SLACK_BOT_TOKEN:-}
+      - SLACK_APP_TOKEN=${SLACK_APP_TOKEN:-}
+      - KUMO_MODE=${KUMO_MODE:-observe}
+      - KUMO_ENABLED=${KUMO_ENABLED:-true}
+      - KUMO_POLICY_PATH=${KUMO_POLICY_PATH:-}
+      - TRUST_PROXY_HOPS=${TRUST_PROXY_HOPS:-1}
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/api/status"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+
+volumes:
+  alphaclaw-data:
