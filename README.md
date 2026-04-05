@@ -13,7 +13,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT" /></a>
 </p>
 
-<p align="center">AlphaClaw wraps <a href="https://github.com/openclaw/openclaw">OpenClaw</a> with a convenient setup wizard, self-healing watchdog, Git-backed rollback, and full browser-based observability. This fork bundles <a href="https://github.com/kumo-ai/kumo">Kumo</a>, a TLS-intercepting AI firewall proxy, so every outbound HTTP request your agent makes is observable and controllable from the first second. Ships with anti-drift prompt hardening, simplified integrations (Google Workspace, Telegram, Slack, Discord), and zero-config network security.</p>
+<p align="center">AlphaClaw wraps <a href="https://github.com/openclaw/openclaw">OpenClaw</a> with a convenient setup wizard, self-healing watchdog, Git-backed rollback, and full browser-based observability. This fork bundles <a href="https://github.com/garrytan/kumo">Kumo</a>, a TLS-intercepting AI firewall proxy, so every outbound HTTP request your agent makes is observable and controllable from the first second. Ships with anti-drift prompt hardening, simplified integrations (Google Workspace, Telegram, Slack, Discord), and zero-config network security.</p>
 
 <p align="center"><em>OpenClaw, but safe. First deploy to first message in under five minutes.</em></p>
 
@@ -163,7 +163,7 @@ The built-in watchdog monitors gateway health and recovers from failures automat
 
 ## Kumo AI Firewall
 
-This fork bundles [Kumo](https://github.com/kumo-ai/kumo), a TLS-intercepting HTTP proxy that sits between your agent and the internet. Every outbound request is visible. You decide what's allowed.
+This fork bundles [Kumo](https://github.com/garrytan/kumo), a TLS-intercepting HTTP proxy that sits between your agent and the internet. Every outbound request is visible. You decide what's allowed.
 
 ### How It Works
 
