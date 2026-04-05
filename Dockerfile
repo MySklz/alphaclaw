@@ -27,10 +27,10 @@ COPY kumo/templates/ /etc/kumo/templates/
 
 # AlphaClaw
 WORKDIR /app
-COPY package.json package-lock.json* ./
-RUN npm install --omit=dev
 COPY . .
+RUN npm install
 RUN npm run build:ui
+RUN npm prune --omit=dev
 ENV PATH="/app/node_modules/.bin:$PATH"
 ENV ALPHACLAW_ROOT_DIR=/data
 
