@@ -69,6 +69,13 @@ AlphaClaw uses [Vitest](https://vitest.dev/) for testing.
 - `bin/` - CLI entrypoint (`alphaclaw.js`)
 - `lib/` - Core library (gateway manager, watchdog, setup UI, webhooks, etc.)
 - `tests/` - Test suites
+- `kumo/` - Vendored Kumo Go source (AI firewall proxy, built in Docker)
+- `templates/` - Kumo policy templates (YAML security rules)
+- `docker-entrypoint.sh` - Container orchestration (Kumo + AlphaClaw startup)
+- `proxy-bootstrap.js` - Node.js fetch proxy patch (loaded via NODE_OPTIONS)
+- `kumo-doctor.sh` - Runtime diagnostics script
+- `smoke-test.sh` - Integration test for Docker builds
+- `.claude/skills/kumo-doctor/` - GStack troubleshooting skill for Kumo
 
 ## Submitting Changes
 
