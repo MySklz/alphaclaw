@@ -12,7 +12,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/kumo-ai/kumo/pkg/types"
+	"github.com/garrytan/kumo/pkg/types"
 )
 
 var (

@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kumo-ai/kumo/internal/policy"
-	"github.com/kumo-ai/kumo/pkg/types"
+	"github.com/garrytan/kumo/internal/policy"
+	"github.com/garrytan/kumo/pkg/types"
 )
 
 // ReplayResult is the outcome of replaying one request against a policy.

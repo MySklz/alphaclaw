@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kumo-ai/kumo/pkg/types"
+	"github.com/garrytan/kumo/pkg/types"
 )
 
 func TestLoggerWritesJSONL(t *testing.T) {

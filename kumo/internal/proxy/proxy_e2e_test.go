@@ -16,10 +16,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kumo-ai/kumo/internal/logger"
-	"github.com/kumo-ai/kumo/internal/policy"
-	"github.com/kumo-ai/kumo/internal/proxy"
-	"github.com/kumo-ai/kumo/pkg/types"
+	"github.com/garrytan/kumo/internal/logger"
+	"github.com/garrytan/kumo/internal/policy"
+	"github.com/garrytan/kumo/internal/proxy"
+	"github.com/garrytan/kumo/pkg/types"
 )
 
 // testHarness holds all the components for an e2e test.

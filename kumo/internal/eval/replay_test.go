@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/kumo-ai/kumo/pkg/types"
+	"github.com/garrytan/kumo/pkg/types"
 )
 
 func TestReplay(t *testing.T) {

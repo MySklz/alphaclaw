@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/kumo-ai/kumo/pkg/types"
+	"github.com/garrytan/kumo/pkg/types"
 )
 
 // Logger writes traffic entries to JSONL files with daily rotation.

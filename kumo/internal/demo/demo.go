@@ -18,10 +18,10 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/kumo-ai/kumo/internal/analyzer"
-	"github.com/kumo-ai/kumo/internal/logger"
-	"github.com/kumo-ai/kumo/internal/policy"
-	"github.com/kumo-ai/kumo/internal/proxy"
+	"github.com/garrytan/kumo/internal/analyzer"
+	"github.com/garrytan/kumo/internal/logger"
+	"github.com/garrytan/kumo/internal/policy"
+	"github.com/garrytan/kumo/internal/proxy"
 )
 
 // Run executes the demo.

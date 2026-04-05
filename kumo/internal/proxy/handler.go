@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/elazarl/goproxy"
-	"github.com/kumo-ai/kumo/pkg/types"
+	"github.com/garrytan/kumo/pkg/types"
 )
 
 // PolicyEngine evaluates requests against security policies.

@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/kumo-ai/kumo/pkg/types"
+	"github.com/garrytan/kumo/pkg/types"
 )
 
 // WebhookNotifier sends events to a configured webhook URL.

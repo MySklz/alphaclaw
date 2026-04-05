@@ -1,4 +1,4 @@
-module github.com/kumo-ai/kumo
+module github.com/garrytan/kumo
 
 go 1.26.1
 

@@ -18,8 +18,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/kumo-ai/kumo/internal/policy"
-	"github.com/kumo-ai/kumo/pkg/types"
+	"github.com/garrytan/kumo/internal/policy"
+	"github.com/garrytan/kumo/pkg/types"
 	"gopkg.in/yaml.v3"
 )
 
