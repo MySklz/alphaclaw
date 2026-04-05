@@ -1,0 +1,37 @@
+# render.yaml — Render Blueprint for AlphaClaw + Kumo
+# Deploy: https://render.com/deploy?repo=https://github.com/garrytan/alphaclaw
+#
+# This deploys the full AlphaClaw + Kumo stack as a single Docker service.
+# Kumo (AI firewall proxy) starts automatically in observe mode.
+
+services:
+  - type: web
+    name: alphaclaw
+    runtime: docker
+    plan: starter plus
+    healthCheckPath: /api/status
+    envVars:
+      - key: SETUP_PASSWORD
+        generateValue: true
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: GITHUB_TOKEN
+        sync: false
+      - key: GITHUB_WORKSPACE_REPO
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: DISCORD_BOT_TOKEN
+        sync: false
+      - key: SLACK_BOT_TOKEN
+        sync: false
+      - key: KUMO_MODE
+        value: observe
+      - key: KUMO_ENABLED
+        value: "true"
+      - key: TRUST_PROXY_HOPS
+        value: "1"
+    disk:
+      name: alphaclaw-data
+      mountPath: /data
+      sizeGB: 10

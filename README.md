@@ -18,8 +18,8 @@
 <p align="center"><em>OpenClaw, but safe. First deploy to first message in under five minutes.</em></p>
 
 <p align="center">
-  <a href="https://railway.com/deploy/openclaw-fast-start?referralCode=jcFhp_&utm_medium=integration&utm_source=template&utm_campaign=generic"><img src="https://railway.com/button.svg" alt="Deploy on Railway" /></a>
-  <a href="https://render.com/deploy?repo=https://github.com/chrysb/openclaw-render-template"><img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" /></a>
+  <a href="https://railway.com/deploy?repo=https://github.com/garrytan/alphaclaw"><img src="https://railway.com/button.svg" alt="Deploy on Railway" /></a>
+  <a href="https://render.com/deploy?repo=https://github.com/garrytan/alphaclaw"><img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" /></a>
 </p>
 
 > **Platform:** AlphaClaw currently targets Docker/Linux deployments. macOS local development is not yet supported.
@@ -58,10 +58,10 @@ AlphaClaw simply wraps OpenClaw, it's not a dependency. Remove AlphaClaw and you
 
 ### Deploy (recommended)
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/openclaw-fast-start?referralCode=jcFhp_&utm_medium=integration&utm_source=template&utm_campaign=generic)
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/chrysb/openclaw-render-template)
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy?repo=https://github.com/garrytan/alphaclaw)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/garrytan/alphaclaw)
 
-Set `SETUP_PASSWORD` at deploy time and visit your deployment URL. The welcome wizard handles the rest.
+Set `SETUP_PASSWORD` and `ANTHROPIC_API_KEY` at deploy time and visit your deployment URL. Kumo starts automatically in observe mode. The welcome wizard handles the rest.
 
 > **Railway users:** after deploying, upgrade to the **Hobby plan** and redeploy to ensure your service has at least **8 GB of RAM**. The Trial plan's memory limit can cause out-of-memory crashes during normal operation.
 
@@ -391,7 +391,15 @@ npm run test:watch      # Watch mode
 npm run test:coverage   # Coverage report
 ```
 
-**Requirements:** Node.js ≥ 22.14.0
+### Testing the Docker image
+
+```bash
+docker build -t alphaclaw-test .                                    # Build the full image (~2-5 min)
+docker run --rm alphaclaw-test /bin/sh /app/smoke-test.sh           # Run integration tests
+docker run --rm -e SETUP_PASSWORD=test alphaclaw-test kumo-doctor   # Run diagnostics
+```
+
+**Requirements:** Node.js >= 22.14.0, Docker (for Kumo integration testing)
 
 ## License
 
