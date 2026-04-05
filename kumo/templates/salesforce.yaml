@@ -1,0 +1,42 @@
+# Kumo Policy Template: Salesforce REST API
+# Covers: contact/opportunity management, reporting
+# Docs: https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/
+
+version: 1
+name: salesforce-template
+description: Default security policy for Salesforce API access
+
+rules:
+  fast:
+    - name: salesforce_read
+      action: allow
+      match:
+        hosts: ["*.salesforce.com", "*.force.com"]
+        methods: ["GET"]
+
+    - name: salesforce_write_records
+      action: allow
+      match:
+        hosts: ["*.salesforce.com", "*.force.com"]
+        methods: ["POST", "PATCH"]
+        paths: ["/services/data/*/sobjects/**"]
+
+    - name: salesforce_block_delete
+      action: block
+      match:
+        hosts: ["*.salesforce.com", "*.force.com"]
+        methods: ["DELETE"]
+      message: "Record deletion in Salesforce is restricted."
+
+    - name: salesforce_block_admin
+      action: block
+      match:
+        hosts: ["*.salesforce.com", "*.force.com"]
+        paths: ["/services/data/*/tooling/**", "/services/data/*/limits"]
+      message: "Salesforce admin operations are restricted."
+
+  default: flag
+
+ban:
+  max_violations: 3
+  ban_duration: 1h

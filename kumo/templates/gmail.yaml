@@ -1,0 +1,47 @@
+# Kumo Policy Template: Gmail / Google Workspace API
+# Covers: email read, send, draft management
+# Docs: https://developers.google.com/gmail/api
+
+version: 1
+name: gmail-template
+description: Default security policy for Gmail API access
+
+rules:
+  fast:
+    # Read emails
+    - name: gmail_read
+      action: allow
+      match:
+        hosts: ["gmail.googleapis.com", "www.googleapis.com"]
+        methods: ["GET"]
+        paths: ["/gmail/v1/users/*/messages/**", "/gmail/v1/users/*/labels/**", "/gmail/v1/users/*/threads/**"]
+
+    # Send emails (flag for review, not auto-allow)
+    - name: gmail_send
+      action: flag
+      match:
+        hosts: ["gmail.googleapis.com", "www.googleapis.com"]
+        methods: ["POST"]
+        paths: ["/gmail/v1/users/*/messages/send"]
+
+    # Draft management
+    - name: gmail_drafts
+      action: allow
+      match:
+        hosts: ["gmail.googleapis.com", "www.googleapis.com"]
+        methods: ["POST", "PUT", "DELETE"]
+        paths: ["/gmail/v1/users/*/drafts/**"]
+
+    # Block account settings, filters, forwarding
+    - name: gmail_block_settings
+      action: block
+      match:
+        hosts: ["gmail.googleapis.com", "www.googleapis.com"]
+        paths: ["/gmail/v1/users/*/settings/**"]
+      message: "Modifying Gmail settings is restricted."
+
+  default: flag
+
+ban:
+  max_violations: 3
+  ban_duration: 1h

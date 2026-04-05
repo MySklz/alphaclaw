@@ -1,0 +1,39 @@
+# Kumo Policy Template: Slack API
+# Covers: message posting, channel management, user lookup
+# Docs: https://api.slack.com/methods
+
+version: 1
+name: slack-template
+description: Default security policy for Slack API access
+
+rules:
+  fast:
+    # Read operations (safe)
+    - name: slack_read
+      action: allow
+      match:
+        hosts: ["slack.com", "api.slack.com"]
+        methods: ["GET"]
+
+    # Post messages (common agent action)
+    - name: slack_post_message
+      action: allow
+      match:
+        hosts: ["slack.com", "api.slack.com", "hooks.slack.com"]
+        methods: ["POST"]
+        paths: ["/api/chat.postMessage", "/api/chat.update", "/services/**"]
+
+    # Block destructive operations
+    - name: slack_block_delete
+      action: block
+      match:
+        hosts: ["slack.com", "api.slack.com"]
+        methods: ["POST"]
+        paths: ["/api/chat.delete", "/api/conversations.archive", "/api/users.admin.*"]
+      message: "Destructive Slack operations are restricted."
+
+  default: flag
+
+ban:
+  max_violations: 3
+  ban_duration: 1h

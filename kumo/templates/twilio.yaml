@@ -1,0 +1,45 @@
+# Kumo Policy Template: Twilio API
+# Covers: SMS, voice calls, messaging
+# Docs: https://www.twilio.com/docs/usage/api
+
+version: 1
+name: twilio-template
+description: Default security policy for Twilio API access
+
+rules:
+  fast:
+    - name: twilio_read
+      action: allow
+      match:
+        hosts: ["api.twilio.com"]
+        methods: ["GET"]
+
+    # Flag outbound messages (cost + spam risk)
+    - name: twilio_send_message
+      action: flag
+      match:
+        hosts: ["api.twilio.com"]
+        methods: ["POST"]
+        paths: ["/2010-04-01/Accounts/*/Messages.json"]
+
+    # Flag outbound calls
+    - name: twilio_make_call
+      action: flag
+      match:
+        hosts: ["api.twilio.com"]
+        methods: ["POST"]
+        paths: ["/2010-04-01/Accounts/*/Calls.json"]
+
+    # Block account management
+    - name: twilio_block_account
+      action: block
+      match:
+        hosts: ["api.twilio.com"]
+        paths: ["/2010-04-01/Accounts.json", "/2010-04-01/Accounts/*/Keys**"]
+      message: "Twilio account management is restricted."
+
+  default: flag
+
+ban:
+  max_violations: 3
+  ban_duration: 1h

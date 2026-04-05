@@ -1,0 +1,47 @@
+# Kumo Policy Template: Greenhouse ATS API
+# Covers: candidate management, interview feedback, scorecards
+# Docs: https://developers.greenhouse.io/harvest.html
+
+version: 1
+name: greenhouse-template
+description: Default security policy for Greenhouse ATS API access
+
+rules:
+  fast:
+    # Read candidates, jobs, applications
+    - name: greenhouse_read
+      action: allow
+      match:
+        hosts: ["harvest.greenhouse.io", "api.greenhouse.io"]
+        methods: ["GET"]
+        paths: ["/v1/candidates/*", "/v1/jobs/*", "/v1/applications/*"]
+
+    # Write notes and scorecards
+    - name: greenhouse_write_notes
+      action: allow
+      match:
+        hosts: ["harvest.greenhouse.io", "api.greenhouse.io"]
+        methods: ["POST", "PUT", "PATCH"]
+        paths: ["/v1/candidates/*/notes", "/v1/candidates/*/scorecards"]
+
+    # Block interview feedback (sensitive, per Brex case study)
+    - name: greenhouse_block_feedback
+      action: block
+      match:
+        hosts: ["harvest.greenhouse.io", "api.greenhouse.io"]
+        paths: ["/v1/candidates/*/interviews/*/feedback"]
+      message: "Access to interview feedback is restricted. Contact your hiring manager."
+
+    # Block candidate rejection without approval
+    - name: greenhouse_flag_rejection
+      action: flag
+      match:
+        hosts: ["harvest.greenhouse.io", "api.greenhouse.io"]
+        methods: ["POST"]
+        paths: ["/v1/candidates/*/reject"]
+
+  default: flag
+
+ban:
+  max_violations: 3
+  ban_duration: 1h

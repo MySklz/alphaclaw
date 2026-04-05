@@ -1,0 +1,122 @@
+# Kumo Policy Template: AlphaClaw Default
+# Covers: AI providers, GitHub workspace sync, messaging platforms, Google Workspace
+# Mode: observe (default) — everything logged, nothing blocked unless explicitly ruled
+#
+# Switch to enforce mode with KUMO_MODE=enforce to activate block rules.
+# In observe mode, block rules are logged but not enforced.
+
+version: 1
+name: alphaclaw-default
+description: Default security policy for AlphaClaw with Kumo
+
+rules:
+  fast:
+    # --- AI Provider APIs (core functionality) ---
+    - name: allow_anthropic
+      action: allow
+      match:
+        hosts: ["api.anthropic.com"]
+
+    - name: allow_openai
+      action: allow
+      match:
+        hosts: ["api.openai.com", "auth.openai.com"]
+
+    - name: allow_google_ai
+      action: allow
+      match:
+        hosts: ["generativelanguage.googleapis.com", "aistudio.google.com"]
+
+    - name: allow_mistral
+      action: allow
+      match:
+        hosts: ["api.mistral.ai"]
+
+    - name: allow_groq
+      action: allow
+      match:
+        hosts: ["api.groq.com"]
+
+    # --- GitHub (workspace sync) ---
+    - name: allow_github_read
+      action: allow
+      match:
+        hosts: ["api.github.com", "github.com"]
+        methods: ["GET"]
+
+    - name: allow_github_write
+      action: allow
+      match:
+        hosts: ["api.github.com"]
+        methods: ["POST", "PATCH", "PUT"]
+        paths: ["/repos/*/git/**", "/repos/*/contents/**", "/repos/*/issues/**", "/repos/*/pulls/**"]
+
+    - name: block_github_destructive
+      action: block
+      match:
+        hosts: ["api.github.com"]
+        methods: ["DELETE"]
+        paths: ["/repos/*", "/repos/*/collaborators/*", "/orgs/*"]
+      message: "Repository and organization deletion is restricted."
+
+    - name: block_github_branch_delete
+      action: block
+      match:
+        hosts: ["api.github.com"]
+        methods: ["DELETE"]
+        paths: ["/repos/*/git/refs/**"]
+      message: "Branch deletion is restricted."
+
+    # --- Messaging platforms ---
+    - name: allow_telegram
+      action: allow
+      match:
+        hosts: ["api.telegram.org"]
+
+    - name: allow_discord
+      action: allow
+      match:
+        hosts: ["discord.com", "gateway.discord.gg", "cdn.discordapp.com"]
+
+    - name: allow_slack
+      action: allow
+      match:
+        hosts: ["slack.com", "api.slack.com", "hooks.slack.com"]
+
+    # --- Google Workspace ---
+    - name: allow_google_workspace
+      action: allow
+      match:
+        hosts:
+          - "www.googleapis.com"
+          - "oauth2.googleapis.com"
+          - "accounts.google.com"
+          - "gmail.googleapis.com"
+          - "calendar-json.googleapis.com"
+          - "docs.googleapis.com"
+          - "sheets.googleapis.com"
+          - "drive.googleapis.com"
+          - "tasks.googleapis.com"
+          - "people.googleapis.com"
+          - "meet.googleapis.com"
+
+    # --- npm registry (AlphaClaw self-updates) ---
+    - name: allow_npm
+      action: allow
+      match:
+        hosts: ["registry.npmjs.org"]
+        methods: ["GET"]
+
+    # --- Block admin/internal endpoints across all hosts ---
+    - name: block_admin_apis
+      action: block
+      match:
+        paths: ["/admin/**", "/internal/**"]
+        methods: ["POST", "PUT", "DELETE"]
+      message: "Admin API access is restricted."
+
+  default: flag
+
+ban:
+  max_violations: 3
+  ban_duration: 1h

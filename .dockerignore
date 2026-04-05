@@ -1,0 +1,9 @@
+.git
+node_modules
+tests
+kumo/dist
+kumo/bin
+.context
+.claude
+*.md
+!README.md

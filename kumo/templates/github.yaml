@@ -1,0 +1,48 @@
+# Kumo Policy Template: GitHub API
+# Covers: repository access, issue management, code operations
+# Docs: https://docs.github.com/en/rest
+
+version: 1
+name: github-template
+description: Default security policy for GitHub API access
+
+rules:
+  fast:
+    # Read operations
+    - name: github_read
+      action: allow
+      match:
+        hosts: ["api.github.com"]
+        methods: ["GET"]
+
+    # Issue/PR management (common agent actions)
+    - name: github_issues
+      action: allow
+      match:
+        hosts: ["api.github.com"]
+        methods: ["POST", "PATCH"]
+        paths: ["/repos/*/issues", "/repos/*/issues/*", "/repos/*/issues/*/comments", "/repos/*/pulls/*/reviews"]
+
+    # Block repo deletion, admin actions
+    - name: github_block_destructive
+      action: block
+      match:
+        hosts: ["api.github.com"]
+        methods: ["DELETE"]
+        paths: ["/repos/*", "/repos/*/collaborators/*", "/orgs/*"]
+      message: "Repository and organization deletion is restricted."
+
+    # Block force push / branch deletion
+    - name: github_block_branch_ops
+      action: block
+      match:
+        hosts: ["api.github.com"]
+        methods: ["DELETE"]
+        paths: ["/repos/*/git/refs/**"]
+      message: "Branch deletion is restricted."
+
+  default: flag
+
+ban:
+  max_violations: 3
+  ban_duration: 1h

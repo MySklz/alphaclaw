@@ -1,0 +1,53 @@
+# Kumo Policy Template: Stripe API
+# Covers: payment processing, customer management
+# Docs: https://stripe.com/docs/api
+
+version: 1
+name: stripe-template
+description: Default security policy for Stripe API access
+
+rules:
+  fast:
+    - name: stripe_read
+      action: allow
+      match:
+        hosts: ["api.stripe.com"]
+        methods: ["GET"]
+
+    # Flag payment creation (high-risk, should be reviewed)
+    - name: stripe_create_payment
+      action: flag
+      match:
+        hosts: ["api.stripe.com"]
+        methods: ["POST"]
+        paths: ["/v1/payment_intents", "/v1/charges"]
+
+    - name: stripe_customer_ops
+      action: allow
+      match:
+        hosts: ["api.stripe.com"]
+        methods: ["POST", "PATCH"]
+        paths: ["/v1/customers", "/v1/customers/*"]
+
+    # Block refunds and disputes (high-risk financial operations)
+    - name: stripe_block_refunds
+      action: block
+      match:
+        hosts: ["api.stripe.com"]
+        methods: ["POST"]
+        paths: ["/v1/refunds", "/v1/disputes/*/close"]
+      message: "Refund and dispute operations are restricted."
+
+    # Block account/key management
+    - name: stripe_block_admin
+      action: block
+      match:
+        hosts: ["api.stripe.com"]
+        paths: ["/v1/accounts", "/v1/api_keys"]
+      message: "Stripe account management is restricted."
+
+  default: flag
+
+ban:
+  max_violations: 3
+  ban_duration: 1h
